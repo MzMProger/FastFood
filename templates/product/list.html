@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card p-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-10"><h5 class="mb-0">Mahsulotlar</h5></div>
+                            <div class="col-md-1 mx-auto">
+                                <a href="{% url 'dashboard:product-create' %}" class="btn btn-success mt-2"
+                                   data-toggle="tooltip" data-original-title="Добавить">
+                                    Qo'shish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-flush" id="datatable-basic">
+                                <form method="GET">
+                                    <thead>
+                                        <tr>
+                                            <th class="align-middle text-center" colspan="3">
+                                                <input type="text" id="id_search" name="search" class="form-control form-control-sm" value="{{ search }}" placeholder="Qidirish ...">
+                                            </th>
+                                            <th class="align-middle text-center" colspan="2" >
+                                                <select class="form-control form-control-sm" id="category_id"  name="category_id">
+                                                    {% for category in categories %}
+                                                    <option value="{{ category.id }}" {% if category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </th>
+                                            <th class="align-middle text-center" colspan="1">
+                                                <button type="submit" class="btn btn-primary btn-sm font-weight-bold text-xs" style="margin: 0 !important;"><i class="fas fa-filter"> </i><span> Фильтровать </span></button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </form>
+                                <thead class="thead-light">
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        ID
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Nomi
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Kategoriya
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Narxi
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Status
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td class="text-sm font-weight-normal"><div style="margin-left:1rem;">{{ product.id }}</div></td>
+                                    <td class="text-sm text-center font-weight-normal">{{ product.name }}</td>
+                                    <td class="text-sm text-center font-weight-normal">{{ product.category.name }}</td>
+                                    <td class="text-sm text-center font-weight-normal">{{ product.price }} won</td>
+                                    <td class="text-sm text-center font-weight-normal">
+                                        {% if product.is_active %}
+                                        Aktiv
+                                        {% else %}
+                                        Aktiv emas
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-sm text-center font-weight-normal">
+                                        <a href="{% url 'dashboard:product-edit' pk=product.id %}" class="badge badge-sm bg-gradient-warning font-weight-bold text-xs" data-toggle="tooltip" data-original-title="O'zgartirish">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'dashboard:product-delete' pk=product.id %}" class="faq-delete badge badge-sm bg-gradient-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="O'chirib tashlash">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block javascript %}
+<script>
+    $(".faq-delete").click(function(e){
+        var access_url = $(this).attr('href');
+        e.preventDefault();
+        Swal.fire(
+            {
+            title: "Diqqat",
+            text: "Bu mahsulotni o'chirib yubormoqchimisiz?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Xa",
+            cancelButtonText: "Yo'q",
+            backdrop: `
+                rgba(16,196,105,.25)
+                left top
+                no-repeat
+              `
+            }
+        ).then(function(result){
+            if (result.value) {
+                $.ajax({
+                    type: 'GET',
+                    url: access_url,
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Bararildi!",
+                            text: "Tanlangan mahsulot ochirib yuborildi o'chirib yuborildi!",
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        setTimeout(function() { window.location.href = response.url; }, 1500);
+                    },
+                    error: function (error) {
+                        Swal.fire("Xato", "Tanlangan mahsulot o'chirilmadi!", "error")
+                    }
+                })
+            }
+        })
+    });
+</script>
+{% endblock javascript %}

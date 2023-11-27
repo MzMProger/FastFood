@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-10"><h5 class="mb-0">Buyurtmalar</h5></div>
+                            <div class="col-md-2 mx-auto">
+                                <form method="get">
+                                    <div class="form-group">
+                                        <label for="id_order_status_filter">Status</label>
+                                        <select name="status" class="form-control" id="id_order_status_filter" onchange="this.form.submit()">
+                                            <option value="" {% if status == '' %}selected{% endif %}>Hammasi</option>
+                                            <option value="pending" {% if status == 'pending' %}selected{% endif %}>Kutilmoqda</option>
+                                            <option value="denied" {% if status == 'denied' %}selected{% endif %}>Bekor qilingan</option>
+                                            <option value="preparing" {% if status == 'preparing' %}selected{% endif %}>Tayyorlanmoqda</option>
+                                            <option value="prepared" {% if status == 'prepared' %}selected{% endif %}>Tayyor</option>
+                                            <option value="delivering" {% if status == 'delivering' %}selected{% endif %}>Kuryerda</option>
+                                            <option value="delivered" {% if status == 'delivered' %}selected{% endif %}>Buyurtma topshirildi</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="id_orders_list">
+                        {% for order in orders %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                {% if order.status == 'pending' %}
+                                <span class="badge bg-gradient-primary">{{ order.get_status_display}}</span>
+                                {% elif order.status == 'denied' %}
+                                <span class="badge bg-gradient-danger">{{ order.get_status_display}}</span>
+                                {% elif order.status == 'preparing' %}
+                                <span class="badge bg-gradient-warning">{{ order.get_status_display}}</span>
+                                {% elif order.status == 'prepared' %}
+                                <span class="badge bg-gradient-warning">{{ order.get_status_display}}</span>
+                                {% elif order.status == 'delivering' %}
+                                <span class="badge bg-gradient-warning">{{ order.get_status_display}}</span>
+                                {% elif order.status == 'delivered' %}
+                                <span class="badge bg-gradient-success">{{ order.get_status_display}}</span>
+                                {% endif %}
+                                <span class="badge bg-gradient-success">
+                                    {% if order.order_type == "delivery" %}
+                                    <i class="fas fa-car-side"></i>
+                                    {% elif order.order_type == "take_away" %}
+                                    <i class="fas fa-walking"></i>
+                                    {% endif %}
+                                </span>
+                                <h6 class="card-title mb-0">Buyurtma № {{ order.id }}</h6>
+                                <p class="text-muted">{{ order.phone_number }}</p>
+                                <a href="{% url 'dashboard:order-edit' pk=order.id %}" class="btn btn-warning">Batafsil</a>
+                                <a href="{% url 'dashboard:order-chat' pk=order.id %}" class="btn btn-icon btn-2 btn-primary">
+                                    <span class="btn-inner--icon"><i class="ni ni-chat-round"></i></span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="pagination-container justify-content-end mt-4">
+                            <ul class="pagination pagination-success">
+                                <li class="page-item {% if not orders.has_previous %}disabled{% endif %}">
+                                    <a class="page-link with-prev-row" href="" data-action="{% if orders.has_previous %}?page={{ orders.previous_page_number }}{% endif %}" aria-label="Previous">
+                                        <span aria-hidden="true"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                                    </a>
+                                </li>
+
+                                {% for i in orders.paginator.page_range %}
+                                    {% if orders.number > 5 and forloop.first %}
+                                        <li class="page-item">
+                                            <a class="page-link page-number" href="" data-action="1">1</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link page-number" href="" data-action="2">2</a>
+                                        </li>
+                                        <li class="page-item disabled">
+                                          <a class="page-link page-number" href="" data-action="">...</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if orders.number == i %}
+                                        <li class="page-item active">
+                                            <a class="page-link page-number" href="" data-action="{{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% elif i > orders.number|add:'-5' and i < orders.number|add:'5' %}
+                                        <li class="page-item">
+                                            <a class="page-link page-number" href="" data-action="{{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if orders.paginator.num_pages > orders.number|add:'5' and forloop.last %}
+                                        <li class="page-item page-item">
+                                            <a class="page-link page-number" href="" data-action="">...</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link page-number" href="" data-action="{{ orders.paginator.num_pages|add:'-1' }}">{{ orders.paginator.num_pages|add:'-1' }}</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link page-number" href="" data-action="{{ orders.paginator.num_pages }}">{{ orders.paginator.num_pages }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                <li class="page-item {% if not orders.has_next %}disabled{% endif %}">
+                                    <a class="page-link with-next-row" href="" data-action="{% if orders.has_next %}?page={{ orders.next_page_number }}{% endif %}" aria-label="Next">
+                                        <span aria-hidden="true"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block javascript %}
+<script>
+    $(".faq-delete").click(function(e){
+        var access_url = $(this).attr('href');
+        e.preventDefault();
+        Swal.fire(
+            {
+            title: "Diqqat",
+            text: "Bu mahsulotni o'chirib yubormoqchimisiz?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Xa",
+            cancelButtonText: "Yo'q",
+            backdrop: `
+                rgba(16,196,105,.25)
+                left top
+                no-repeat
+              `
+            }
+        ).then(function(result){
+            if (result.value) {
+                $.ajax({
+                    type: 'GET',
+                    url: access_url,
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Bararildi!",
+                            text: "Tanlangan mahsulot ochirib yuborildi o'chirib yuborildi!",
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        setTimeout(function() { window.location.href = response.url; }, 1500);
+                    },
+                    error: function (error) {
+                        Swal.fire("Xato", "Tanlangan mahsulot o'chirilmadi!", "error")
+                    }
+                })
+            }
+        })
+    });
+</script>
+<script>
+    console.log("Creating web socket");
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/order/list/notification/'
+    );
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        var status_badge = ""
+        if(data.data.status == 'pending'){
+            status_badge = '<span class="badge bg-gradient-primary">' + data.data.status_label +'</span>'
+        }else if(data.data.status == 'denied'){
+            status_badge = '<span class="badge bg-gradient-danger">' + data.data.status_label +'</span>'
+        }else if(data.data.status == 'preparing'){
+            status_badge = '<span class="badge bg-gradient-warning">' + data.data.status_label +'</span>'
+        }else if(data.data.status == 'prepared'){
+            status_badge = '<span class="badge bg-gradient-warning">' + data.data.status_label +'</span>'
+        }else if(data.data.status == 'delivering'){
+            status_badge = '<span class="badge bg-gradient-warning">' + data.data.status_label +'</span>'
+        }else if(data.data.status == 'delivered'){
+            status_badge = '<span class="badge bg-gradient-success">' + data.data.status_label +'</span>'
+        }
+
+        var order_type = ""
+        if(data.data.order_type == 'delivery'){
+            order_type = '<span class="badge bg-gradient-success"><i class="fas fa-car-side"></i></span>'
+        }else if(data.data.order_type == 'take_away'){
+            order_type = '<span class="badge bg-gradient-success"><i class="fas fa-walking"></i></span>'
+        }
+        var child = `<div class="card mb-3">
+            <div class="card-body">` + status_badge + order_type + `<h6 class="card-title mb-0">Buyurtma № ` + data.data.id + `</h6>
+            <p class="text-muted">` + data.data.phone_number + `</p>
+            <a href="/order/` + data.data.id + `/edit/" class="btn btn-warning">Batafsil</a>
+            <a href="/order/` + data.data.id + `/chat/" class="btn btn-icon btn-2 btn-primary"><span class="btn-inner--icon"><i class="ni ni-chat-round"></i></span></a>
+            </div>
+        </div>`
+        $("#id_orders_list").prepend(child);
+    };
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+</script>
+<script>
+    function filterPage(addToPage){
+        var status = $("#id_order_status_filter option:selected").val();
+        var page = parseInt($("li.page-item.active a.page-link").html()) + addToPage;
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        urlParams.set('status', status);
+        urlParams.set('per_page', 15);
+        urlParams.set('page', page);
+
+        window.location.search = urlParams;
+    }
+    $("a.page-link.page-number").click(function(e){
+        e.preventDefault();
+        var page = parseInt($(this).html());
+        if (parseInt($("li.page-item.active a.page-link").html()) != page){
+            filterPage(page - parseInt($("li.page-item.active a.page-link").html()));
+        }
+    });
+    $("a.page-link.with-next-row").click(function(e){
+        e.preventDefault();
+        filterPage(1);
+    });
+    $("a.page-link.with-prev-row").click(function(e){
+        e.preventDefault();
+        filterPage(-1);
+    });
+</script>
+{% endblock javascript %}

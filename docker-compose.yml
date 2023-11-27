@@ -1,0 +1,81 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: fastfood_cache
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis:/data
+
+  db:
+    image: postgres
+    container_name: fastfood_db
+    ports:
+      - '5432:5432'
+    restart: always
+    env_file:
+      - copy_env
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: fastfood_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/static_root
+      - media_volume:/app/media_root
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    env_file:
+      - copy_env
+    depends_on:
+      - db
+
+  channels:
+    build: .
+    container_name: fastfood_channels
+    command: daphne -b 0.0.0.0 -p 8001 fastfood.asgi:application
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8001"
+    links:
+      - redis
+
+  bot:
+    build: .
+    container_name: fastfood_bot
+    command: python manage.py runbot
+    volumes:
+      - .:/app
+      - media_volume:/app/media_root
+    env_file:
+      - copy_env
+    depends_on:
+      - db
+
+#  nginx:
+#    build: ./nginx
+#    container_name: fastfood_nginx
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - web
+#    volumes:
+#      - static_volume:/app/static_root
+#      - media_volume:/app/media_root
+
+
+
+volumes:
+  postgres-db:
+  static_volume:
+  media_volume:
+  redis:

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header" style="padding: 15px;">
+                        <div class="col-md-12">
+                            <div class="toast fade hide p-2 mt-2 bg-white" role="alert" aria-live="assertive"
+                                 id="dangerToast" aria-atomic="true">
+                                <div class="toast-header border-0">
+                                    <i class="ni ni-notification-70 text-danger me-2"></i>
+                                    <span class="me-auto text-gradient text-danger font-weight-bold">Status</span>
+                                    <i class="fas fa-times text-md ms-3 cursor-pointer" data-bs-dismiss="toast"
+                                       aria-label="Close"></i>
+                                </div>
+                                <hr class="horizontal dark m-0">
+                                <div class="toast-body">
+                                    {{ message }}
+                                </div>
+                            </div>
+                            <h5 class="">Buyurtma №{{ model.id }}</h5>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding: 5px;">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <h6 class="mb-4">Umumiy malumot</h6>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <span class="mb-2 text-sm">
+                                    Buyurtmachi:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ model.telegram_user.first_name }} {{ model.telegram_user.last_name }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Izoh:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{% if model.comment %}{{ model.comment }}{% else %}Yo'q{% endif %}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Turi:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ model.get_order_type_display }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Telefon raqam:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ model.phone_number }}</span>
+                                </div>
+                                {% if model.order_type == "delivery" %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Manzil:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">
+                                        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ model.latitude }},{{ model.longitude }}"> Google Maps </a>
+                                        <a target="_blank" href="{% url 'dashboard:order-map' pk=model.id %}"> Kakao Maps </a>
+                                    </span>
+                                </div>
+                                {% else %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Olib ketish vaqti:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ model.takeaway_time }} minutdan keyin</span>
+                                </div>
+                                {% endif %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Qo'shilgan vaqti:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ model.created_at|date:'H:i d-m-Y' }}</span>
+                                </div>
+                                <br>
+                                <h6 class="mb-4">Mahsulotlar va narxlar</h6>
+                                {% for op in order_products %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    {{ op.product.category.name }} {{ op.product.name }}
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ op.amount }} x {{ op.price_per_one }} won</span>
+                                </div>
+                                {% endfor %}
+                                <div class="d-flex justify-content-between mt-4">
+                                    <span class="mb-2 text-sm">
+                                    Mahsulotlar narxi:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ model.total_price|subtract:model.delivery_price }} won</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Yetkazib berish narxi:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ model.delivery_price }} won</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <span class="mb-2 text-md">
+                                    Umumiy:
+                                    </span>
+                                    <span class="text-dark text-md ms-2 font-weight-bold">{{ model.total_price }} won</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <form method="post" autocomplete=off enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        {{ form.status.errors }}
+                                        <label class="form-control-label" for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                                        {{ form.status }}
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group text-left mb-0">
+                                        <div class="col-lg-3 col-sm-6 col-12 mt-lg-0 mt-2">
+                                          <button class="btn btn-danger w-100 mb-0 toast-btn" style="display: none;" id="idAlertTrigger" type="button" data-target="dangerToast"></button>
+                                        </div>
+                                        {% if model %}
+                                        <button class="btn btn-warning waves-effect waves-light mr-1" type="submit">
+                                            Saqlash
+                                        </button>
+                                        {% endif %}
+                                        <a href="{% url 'dashboard:order-list' %}" class="btn btn-danger waves-effect waves-light">
+                                            Bekor qilish
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block javascript %}
+<script>
+    var msg = "{{ message }}";
+    if (msg != ""){
+        $(document).ready(function(){
+            $( "#idAlertTrigger" ).trigger( "click" );
+        });
+    }
+</script>
+{% endblock javascript %}

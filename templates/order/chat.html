@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="col-md-12">
+                            <h5 class="">Buyurtma №{{ model.id }} egasiga xabar yuborish</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" autocomplete=off enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.text.errors }}
+                                        <label class="form-control-label" for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>
+                                        {{ form.text }}
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group text-left mb-0">
+                                        <button class="btn btn-warning waves-effect waves-light mr-1" type="submit">
+                                            Yuborish
+                                        </button>
+                                        <a href="{% url 'dashboard:order-list' %}" class="btn btn-danger waves-effect waves-light">
+                                            Bekor qilish
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

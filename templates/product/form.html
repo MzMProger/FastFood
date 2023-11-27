@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<link href="{% static 'js/plugins/dropify/dropify.min.css' %}" rel="stylesheet"/>
+{% endblock css %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="col-md-12">
+                            <h5 class="">{% if model %}O'zgartirish {{ model.name }}{% else %}Mahsulot qo'shish{% endif %}</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" autocomplete=off enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.name.errors }}
+                                        <label class="form-control-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                                        {{ form.name }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.price.errors }}
+                                        <label class="form-control-label" for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+                                        {{ form.price }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.desc.errors }}
+                                        <label class="form-control-label" for="{{ form.desc.id_for_label }}">{{ form.desc.label }}</label>
+                                        {{ form.desc }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.image.errors }}
+                                        <label class="form-control-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                                        {{ form.image }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.category.errors }}
+                                        <label class="form-control-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                                        {{ form.category }}
+                                    </div>
+                                    <div class="form-check">
+                                        {{ form.is_active.errors }}
+                                        <label class="form-control-label" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+                                        {{ form.is_active }}
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group text-left mb-0">
+                                        {% if model %}
+                                        <button class="btn btn-warning waves-effect waves-light mr-1" type="submit">
+                                            Saqlash
+                                        </button>
+                                        {% else %}
+                                        <button class="btn btn-success waves-effect waves-light mr-1" type="submit">
+                                            Qo'shish
+                                        </button>
+                                        {% endif %}
+                                        <a href="{% url 'dashboard:product-list' %}" class="btn btn-danger waves-effect waves-light">
+                                            Bekor qilish
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block javascript %}
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'js/plugins/dropify/dropify.min.js' %}"></script>
+<script>
+    $(".dropify").dropify(
+        {
+            messages:{
+                default:"Rasm tanglang",
+                remove:"O'chirib yuborish",
+                error:"Xatolik yuz berdi!"
+            }
+        }
+    );
+    $('.dropify-clear').click(function(e){
+        e.preventDefault();
+        $('#id_image_delete_div').html('<input type="hidden" name="deleted_image" value="1">');
+    });
+</script>
+{% endblock javascript %}

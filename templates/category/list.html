@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<link href="{% static 'js/plugins/sweetalert2/sweetalert2.min.css' %}" rel="stylesheet" type="text/css"/>
+{% endblock css %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card p-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-10"><h5 class="mb-0">Kategoriyalar</h5></div>
+                            <div class="col-md-1 mx-auto">
+                                <a href="{% url 'dashboard:category-create' %}" class="btn btn-success mt-2"
+                                   data-toggle="tooltip" data-original-title="Добавить">
+                                    Qo'shish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-flush" id="datatable-basic">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        ID
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Nomi
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Tartib raqami
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Status
+                                    </th>
+                                    <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td class="text-sm font-weight-normal"><div style="margin-left:1rem;">{{ category.id }}</div></td>
+                                    <td class="text-sm text-center font-weight-normal">{{ category.name }}</td>
+                                    <td class="text-sm text-center font-weight-normal">{{ category.order }}</td>
+                                    <td class="text-sm text-center font-weight-normal">
+                                        {% if category.is_active %}
+                                        Aktiv
+                                        {% else %}
+                                        Aktiv emas
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-sm text-center font-weight-normal">
+                                        <a href="{% url 'dashboard:category-edit' pk=category.id %}" class="badge badge-sm bg-gradient-warning font-weight-bold text-xs" data-toggle="tooltip" data-original-title="O'zgartirish">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'dashboard:category-delete' pk=category.id %}" class="faq-delete badge badge-sm bg-gradient-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="O'chirib tashlash">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block javascript %}
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'js/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+<script>
+    $(".faq-delete").click(function(e){
+        var access_url = $(this).attr('href');
+        e.preventDefault();
+        Swal.fire(
+            {
+            title: "Diqqat",
+            text: "Bu kategoriyani o'chirib yubormoqchimisiz?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Xa",
+            cancelButtonText: "Yo'q",
+            backdrop: `
+                rgba(16,196,105,.25)
+                left top
+                no-repeat
+              `
+            }
+        ).then(function(result){
+            if (result.value) {
+                $.ajax({
+                    type: 'GET',
+                    url: access_url,
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Bararildi!",
+                            text: "Tanlangan kategoriya o'chirib yuborildi!",
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        setTimeout(function() { window.location.href = response.url; }, 1500);
+                    },
+                    error: function (error) {
+                        Swal.fire("Xato", "Tanlangan kategoriya o'chirilmadi!", "error")
+                    }
+                })
+            }
+        })
+    });
+</script>
+{% endblock javascript %}

@@ -1,0 +1,90 @@
+{% load static %}
+<nav class="navbar navbar-main navbar-expand-lg  px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur" data-scroll="false">
+    <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+            {% url 'dashboard:dashboard' as dashboard_url %}
+            {% url 'dashboard:category-list' as category_url %}
+            {% url 'dashboard:category-create' as category_create_url %}
+            {% url 'dashboard:category-edit' pk=model.id as category_edit_url %}
+            {% url 'dashboard:product-list' as product_url %}
+            {% url 'dashboard:product-create' as product_create_url %}
+            {% url 'dashboard:product-edit' pk=model.id as product_edit_url %}
+            {% url 'dashboard:order-list' as order_url %}
+            {% url 'dashboard:order-edit' pk=model.id as order_edit_url %}
+            {% url 'dashboard:telegram-user-list' as telegram_user_list_url %}
+            <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                <li class="breadcrumb-item text-sm">
+                    <a class="text-white" href="javascript:;">
+                        <i class="ni ni-box-2"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-item text-sm text-white"><a class="opacity-5 text-white" href="javascript:;"> Sahifalar </a>
+                </li>
+                <li class="breadcrumb-item text-sm text-white active" aria-current="page">
+                    {% if request.path == dashboard_url %}
+                        Dashboard
+                    {% elif request.path == category_url or request.path == category_create_url or request.path == category_edit_url %}
+                        Kategoriyalar
+                    {% elif request.path == product_url or request.path == product_create_url or request.path == product_edit_url %}
+                        Mahsulotlar
+                    {% elif request.path == order_url %}
+                        Buyurtmalar
+                    {% elif request.path == telegram_user_list_url %}
+                        Foydalanuvchilar
+                    {% endif %}
+                </li>
+            </ol>
+            <h6 class="font-weight-bolder mb-0 text-white">
+                {% if request.path == dashboard_url %}
+                Dashboard
+                {% elif request.path == category_url %}
+                Kategoriyalar royxati
+                {% elif request.path == category_create_url %}
+                Kategoriya qo'shish
+                {% elif request.path == category_edit_url %}
+                Kategoriyani o'zgartirish
+                {% elif request.path == product_url %}
+                Mahsulotlar royxati
+                {% elif request.path == product_create_url %}
+                Mahsulot qo'shish
+                {% elif request.path == product_edit_url %}
+                Mahsulotni o'zgartirish
+                {% elif request.path == order_url %}
+                Buyurtmalar royxati
+                {% elif request.path == order_edit_url %}
+                Buyurtmani o'zgartirish
+                {% elif request.path == telegram_user_list_url %}
+                Foydalanuvchilar royxati
+                {% endif %}
+            </h6>
+        </nav>
+        <div class="sidenav-toggler sidenav-toggler-inner d-xl-block d-none ">
+            <a href="javascript:;" class="nav-link p-0">
+                <div class="sidenav-toggler-inner">
+                    <i class="sidenav-toggler-line bg-white"></i>
+                    <i class="sidenav-toggler-line bg-white"></i>
+                    <i class="sidenav-toggler-line bg-white"></i>
+                </div>
+            </a>
+        </div>
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            </div>
+            <ul class="navbar-nav  justify-content-end">
+                <li class="nav-item d-flex align-items-center" id="logout">
+                    <i class="fas fa-power-off me-sm-1 text-danger"></i>
+                    <span class="d-sm-inline d-none text-danger"> Chiqish </span>
+                </li>
+                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-white p-0" id="iconNavbarSidenav">
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line bg-white"></i>
+                            <i class="sidenav-toggler-line bg-white"></i>
+                            <i class="sidenav-toggler-line bg-white"></i>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

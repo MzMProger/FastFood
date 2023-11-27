@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card">
+                    <div class="card-header" style="padding: 15px;">
+                        <div class="col-md-12">
+                            <h5 class="">Foyanlanuvchi: {{ model.first_name }} {{ model.last_name }}</h5>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding: 5px;">
+                        {% for order in orders %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <h5 class="mb-4">Buyurtma №{{ order.id }}</h5>
+                                <h6 class="mb-4">Umumiy malumot</h6>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Status:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ order.get_status_display }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Izoh:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{% if order.comment %}{{ order.comment }}{% else %}Yo'q{% endif %}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Telefon raqam:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ order.phone_number }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Manzil:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">
+                                        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ order.latitude }},{{ order.longitude }}">
+                                            <span class="mr-2">Google Maps</span>
+                                            <i class="fas fa-map-pin"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Qo'shilgan vaqti:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ order.created_at|date:'H:i d-m-Y' }}</span>
+                                </div>
+                                <br>
+                                <h6 class="mb-4">Mahsulotlar va narxlar</h6>
+                                {% for op in order|order_products %}
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    {{ op.product.name }}
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ op.amount }} x {{ op.price_per_one }} won</span>
+                                </div>
+                                {% endfor %}
+                                <div class="d-flex justify-content-between mt-4">
+                                    <span class="mb-2 text-sm">
+                                    Mahsulotlar narxi:
+                                    </span>
+                                    <span class="text-dark font-weight-bold ms-2">{{ order.total_price|subtract:order.delivery_price }} won</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="mb-2 text-sm">
+                                    Yetkazib berish narxi:
+                                    </span>
+                                    <span class="text-dark ms-2 font-weight-bold">{{ order.delivery_price }} won</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <span class="mb-2 text-md">
+                                    Umumiy:
+                                    </span>
+                                    <span class="text-dark text-md ms-2 font-weight-bold">{{ order.total_price }} won</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
